@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Plus, Search, Filter, Edit2, Power, Trash2, Shield, BookOpen, GraduationCap, Users2, RefreshCw } from 'lucide-react';
+import { Users, Plus, Search, Filter, Edit2, Power, Trash2, Shield, BookOpen, GraduationCap, Users2, RefreshCw, Clock, CheckCircle2, XCircle, AlertTriangle, Heart, Loader2 } from 'lucide-react';
 import api from '../../utils/api';
 
 const ROLE_META = {
@@ -9,6 +9,145 @@ const ROLE_META = {
   student:  { color: 'bg-emerald-100 text-emerald-700', icon: GraduationCap },
   guardian: { color: 'bg-orange-100 text-orange-700', icon: Users2 },
 };
+
+const ROLE_ICONS_MAP = { teacher: BookOpen, student: GraduationCap, guardian: Heart, admin: Shield };
+const ROLE_COLORS_MAP = {
+  teacher:  'from-blue-500 to-cyan-500',
+  student:  'from-emerald-500 to-teal-500',
+  guardian: 'from-orange-500 to-amber-500',
+  admin:    'from-violet-600 to-purple-700',
+};
+
+function PendingApprovals({ onApproved }) {
+  const [pending, setPending]       = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [actionId, setActionId]     = useState('');
+  const [rejectModal, setRejectModal] = useState(null); // user object
+  const [reason, setReason]         = useState('');
+
+  const load = useCallback(() => {
+    setLoading(true);
+    api.get('/users/pending').then(r => setPending(r.data.users || [])).finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const approve = async (id) => {
+    setActionId(id);
+    try {
+      await api.put(`/users/${id}/approve`);
+      setPending(p => p.filter(u => u._id !== id));
+      onApproved();
+    } finally { setActionId(''); }
+  };
+
+  const reject = async () => {
+    if (!rejectModal) return;
+    setActionId(rejectModal._id);
+    try {
+      await api.put(`/users/${rejectModal._id}/reject`, { reason });
+      setPending(p => p.filter(u => u._id !== rejectModal._id));
+      setRejectModal(null); setReason('');
+    } finally { setActionId(''); }
+  };
+
+  if (loading) return (
+    <div className="card flex items-center justify-center py-12">
+      <Loader2 size={24} className="animate-spin text-primary-500" />
+    </div>
+  );
+
+  if (!pending.length) return (
+    <div className="card text-center py-12">
+      <CheckCircle2 size={36} className="text-emerald-400 mx-auto mb-3" />
+      <p className="font-semibold text-gray-700">No pending registrations</p>
+      <p className="text-sm text-gray-400 mt-1">All registration requests have been reviewed</p>
+    </div>
+  );
+
+  return (
+    <>
+      <div className="space-y-3">
+        {pending.map(u => {
+          const Icon = ROLE_ICONS_MAP[u.role] || Shield;
+          const grad = ROLE_COLORS_MAP[u.role] || 'from-gray-400 to-gray-500';
+          return (
+            <div key={u._id} className="card !p-4 flex items-center gap-4 group hover:border-amber-200 transition-colors">
+              {/* Avatar */}
+              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${grad} flex items-center justify-center text-white font-black text-base flex-shrink-0`}>
+                {u.name.charAt(0)}
+              </div>
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="font-bold text-gray-900 text-sm">{u.name}</p>
+                  <span className={`badge text-xs bg-gradient-to-r ${grad} text-white px-2 py-0.5`}>
+                    <Icon size={10} className="mr-0.5" />{u.role}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-400 mt-0.5">{u.email}</p>
+                <div className="flex items-center gap-3 mt-1 flex-wrap">
+                  {u.studentId && <span className="text-xs text-gray-400">ID: {u.studentId}</span>}
+                  {u.grade && <span className="text-xs text-gray-400">• {u.grade}</span>}
+                  {u.relationship && <span className="text-xs text-gray-400">• {u.relationship}</span>}
+                  {u.subjects?.length > 0 && <span className="text-xs text-gray-400">• {u.subjects.join(', ')}</span>}
+                  <span className="text-xs text-gray-300">• Registered {new Date(u.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+              {/* Actions */}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  onClick={() => approve(u._id)}
+                  disabled={actionId === u._id}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-bold transition-all border border-emerald-200 disabled:opacity-50"
+                >
+                  {actionId === u._id ? <Loader2 size={12} className="animate-spin" /> : <CheckCircle2 size={12} />}
+                  Approve
+                </button>
+                <button
+                  onClick={() => { setRejectModal(u); setReason(''); }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 text-xs font-bold transition-all border border-red-200"
+                >
+                  <XCircle size={12} />Reject
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Reject modal */}
+      {rejectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(15,10,40,0.6)', backdropFilter: 'blur(8px)' }}>
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-float animate-scale-in">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+                <XCircle size={20} className="text-red-600" />
+              </div>
+              <div>
+                <p className="font-bold text-gray-900 text-sm">Reject Registration</p>
+                <p className="text-xs text-gray-500">{rejectModal.name} · {rejectModal.role}</p>
+              </div>
+            </div>
+            <label className="label">Reason (optional)</label>
+            <textarea
+              value={reason} onChange={e => setReason(e.target.value)}
+              className="input resize-none text-sm" rows={3}
+              placeholder="e.g. Duplicate account, Invalid information..."
+            />
+            <div className="flex gap-2 mt-4">
+              <button onClick={() => setRejectModal(null)} className="btn-secondary flex-1 justify-center text-sm">Cancel</button>
+              <button onClick={reject} disabled={!!actionId} className="btn-danger flex-1 justify-center text-sm">
+                {actionId ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />}
+                Confirm Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
@@ -20,6 +159,7 @@ export default function UserList() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState('');
+  const [activeTab, setActiveTab] = useState('users');
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -57,6 +197,8 @@ export default function UserList() {
     fetchUsers();
   };
 
+  const refreshStats = () => api.get('/users/stats').then(r => setStats(r.data.stats));
+
   return (
     <div className="space-y-6 max-w-7xl">
       {/* Header */}
@@ -72,7 +214,7 @@ export default function UserList() {
 
       {/* Stats bar */}
       {stats && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
           {[
             { label: 'Total', value: stats.total, color: 'text-gray-800' },
             { label: 'Admins', value: stats.admins, color: 'text-violet-700' },
@@ -81,6 +223,7 @@ export default function UserList() {
             { label: 'Guardians', value: stats.guardians, color: 'text-orange-700' },
             { label: 'Active', value: stats.active, color: 'text-emerald-700' },
             { label: 'Inactive', value: stats.inactive, color: 'text-red-700' },
+            { label: 'Pending', value: stats.pending ?? 0, color: 'text-amber-600' },
           ].map((s) => (
             <div key={s.label} className="card py-3 text-center">
               <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
@@ -90,6 +233,31 @@ export default function UserList() {
         </div>
       )}
 
+      {/* Tab bar */}
+      <div className="flex gap-1 p-1 bg-white rounded-2xl border border-gray-100 shadow-soft w-fit">
+        <button
+          onClick={() => setActiveTab('users')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${activeTab === 'users' ? 'bg-gradient-to-r from-primary-600 to-violet-600 text-white shadow-glow-purple' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'}`}
+        >
+          <Users size={14} /> All Users
+        </button>
+        <button
+          onClick={() => setActiveTab('pending')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${activeTab === 'pending' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'}`}
+        >
+          <Clock size={14} /> Pending Approvals
+          {stats?.pending > 0 && (
+            <span className={`px-1.5 py-0.5 rounded-full text-xs font-bold ${activeTab === 'pending' ? 'bg-white/25 text-white' : 'bg-amber-100 text-amber-700'}`}>
+              {stats.pending}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {activeTab === 'pending' ? (
+        <PendingApprovals onApproved={refreshStats} />
+      ) : (
+      <>
       {/* Filters */}
       <div className="card py-4">
         <div className="flex flex-wrap gap-3">
@@ -231,6 +399,8 @@ export default function UserList() {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }

@@ -14,7 +14,12 @@ const userSchema = new mongoose.Schema(
     avatar: { type: String, default: '' },
     phone: { type: String, default: '' },
     address: { type: String, default: '' },
-    isActive: { type: Boolean, default: true },
+    isActive:         { type: Boolean, default: true },
+    isApproved:       { type: Boolean, default: true },   // false = waiting admin approval
+    approvedBy:       { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    approvedAt:       { type: Date, default: null },
+    rejectionReason:  { type: String, default: '' },
+    registrationType: { type: String, enum: ['self', 'admin'], default: 'admin' },
     // Student-specific
     studentId: { type: String, default: '' },
     grade: { type: String, default: '' },

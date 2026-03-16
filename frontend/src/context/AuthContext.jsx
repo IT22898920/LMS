@@ -27,6 +27,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
     setUser(data.user);
+    // Auto-sync progress for student/teacher on login (fire-and-forget)
+    if (data.user.role === 'student') {
+      api.post('/progress/sync').catch(() => {});
+    }
     return data.user;
   };
 
