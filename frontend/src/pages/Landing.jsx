@@ -126,7 +126,7 @@ export default function Landing() {
               <GraduationCap size={19} className="text-white" />
             </div>
             <div>
-              <span className="font-bold text-gray-900 text-base leading-none">EduConnect</span>
+              <span className="font-bold text-gray-900 text-base leading-none">eduCare</span>
               <span className="text-xs text-gray-400 block leading-none mt-0.5">LMS Platform</span>
             </div>
           </div>
@@ -168,7 +168,7 @@ export default function Landing() {
               in education
             </h1>
             <p className="text-lg text-gray-500 leading-relaxed mb-8 max-w-lg">
-              EduConnect unifies admins, teachers, students, and guardians on one intelligent platform —
+              eduCare unifies admins, teachers, students, and guardians on one intelligent platform —
               with smart relationship management, live reports, and granular access control.
             </p>
             <div className="flex flex-wrap gap-3 mb-10">
@@ -411,7 +411,7 @@ export default function Landing() {
             "Education is not just about knowledge transfer —<br />
             it's about building <span className="gradient-text">relationships that last</span>."
           </blockquote>
-          <p className="text-gray-500 text-sm">EduConnect LMS · Educational Relationship Management Platform</p>
+          <p className="text-gray-500 text-sm">eduCare LMS · Educational Relationship Management Platform</p>
         </div>
       </section>
 
@@ -465,7 +465,7 @@ export default function Landing() {
                 <GraduationCap size={18} className="text-white" />
               </div>
               <div>
-                <p className="text-white font-bold">EduConnect LMS</p>
+                <p className="text-white font-bold">eduCare LMS</p>
                 <p className="text-xs text-gray-500">Educational Relationship Management</p>
               </div>
             </div>
@@ -475,7 +475,7 @@ export default function Landing() {
                   className="hover:text-white transition-colors">{item}</a>
               ))}
             </div>
-            <p className="text-xs text-gray-600">© 2025 EduConnect LMS · MERN Stack · ITPM Project</p>
+            <p className="text-xs text-gray-600">© 2025 eduCare LMS · MERN Stack · ITPM Project</p>
           </div>
         </div>
       </footer>
