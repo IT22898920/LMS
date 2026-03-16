@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, Users, Link2, FileText, Users2,
   Activity, LogOut, GraduationCap, Shield, BookOpen,
-  ChevronRight, Heart, BookMarked,
+  ChevronRight, Heart, BookMarked, MessageSquare, ClipboardList,
 } from 'lucide-react';
 
 const ROLE_COLORS = {
@@ -24,6 +24,8 @@ const navItems = {
     { to: '/dashboard/reports',    label: 'Reports',         icon: FileText },
     { to: '/dashboard/groups',     label: 'Learning Groups', icon: Users2 },
     { to: '/dashboard/activity',   label: 'Activity Monitor',icon: Activity },
+    { to: '/dashboard/feedback',   label: 'Feedback',        icon: MessageSquare },
+    { to: '/dashboard/quiz',       label: 'Quiz Management', icon: ClipboardList },
   ],
   teacher: [
     { to: '/dashboard',            label: 'Dashboard',       icon: LayoutDashboard },
@@ -32,6 +34,8 @@ const navItems = {
     { to: '/dashboard/reports',    label: 'Reports',         icon: FileText },
     { to: '/dashboard/groups',     label: 'Learning Groups', icon: Users2 },
     { to: '/dashboard/activity',   label: 'My Activity',     icon: Activity },
+    { to: '/dashboard/feedback',   label: 'Feedback',        icon: MessageSquare },
+    { to: '/dashboard/quiz',       label: 'Quiz Management', icon: ClipboardList },
   ],
   student: [
     { to: '/dashboard',            label: 'Dashboard',       icon: LayoutDashboard },
@@ -39,6 +43,8 @@ const navItems = {
     { to: '/dashboard/reports',    label: 'My Reports',      icon: FileText },
     { to: '/dashboard/groups',     label: 'Learning Groups', icon: Users2 },
     { to: '/dashboard/activity',   label: 'My Activity',     icon: Activity },
+    { to: '/dashboard/feedback',   label: 'Feedback',        icon: MessageSquare },
+    { to: '/dashboard/quiz',       label: 'Quizzes',         icon: ClipboardList },
   ],
   guardian: [
     { to: '/dashboard',            label: 'Dashboard',       icon: LayoutDashboard },
@@ -72,7 +78,7 @@ export default function Sidebar({ open, onClose }) {
                 <GraduationCap size={20} className="text-white" />
               </div>
               <div>
-                <p className="text-white font-bold text-sm leading-none">EduConnect</p>
+                <p className="text-white font-bold text-sm leading-none">eduCare</p>
                 <p className="text-white/60 text-xs mt-0.5">LMS Platform</p>
               </div>
             </div>

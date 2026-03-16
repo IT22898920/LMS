@@ -53,7 +53,7 @@ export default function Login() {
                 <GraduationCap size={26} className="text-white" />
               </div>
               <div>
-                <h1 className="text-white font-bold text-xl">EduConnect LMS</h1>
+                <h1 className="text-white font-bold text-xl">eduCare LMS</h1>
                 <p className="text-white/60 text-sm">ERM Platform</p>
               </div>
             </div>
@@ -99,7 +99,7 @@ export default function Login() {
                 <GraduationCap size={22} className="text-white" />
               </div>
               <div>
-                <h1 className="font-bold text-gray-900">EduConnect LMS</h1>
+                <h1 className="font-bold text-gray-900">eduCare LMS</h1>
                 <p className="text-gray-500 text-xs">ERM Platform</p>
               </div>
             </div>
@@ -195,7 +195,7 @@ export default function Login() {
           </form>
 
           <p className="text-center text-xs text-gray-400 mt-8">
-            EduConnect LMS — Educational Relationship Management Platform
+            eduCare LMS — Educational Relationship Management Platform
           </p>
         </div>
       </div>

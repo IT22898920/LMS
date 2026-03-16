@@ -19,6 +19,8 @@ import GroupList from './pages/Groups/GroupList';
 import GroupDetail from './pages/Groups/GroupDetail';
 import ActivityLog from './pages/Activity/ActivityLog';
 import MaterialsPage from './pages/Materials/MaterialsPage';
+import FeedbackPage from './pages/Feedback/FeedbackPage';
+import QuizPage from './pages/Quiz/QuizPage';
 
 const DashboardRouter = () => {
   const { user } = useAuth();
@@ -54,7 +56,7 @@ function AppRoutes() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 to-purple-700">
       <div className="flex flex-col items-center gap-4">
         <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-        <p className="text-white font-semibold text-lg">EduConnect LMS</p>
+        <p className="text-white font-semibold text-lg">eduCare LMS</p>
       </div>
     </div>
   );
@@ -79,6 +81,8 @@ function AppRoutes() {
         <Route path="groups/:id"      element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
         <Route path="activity"        element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
         <Route path="materials"       element={<ProtectedRoute><MaterialsPage /></ProtectedRoute>} />
+        <Route path="feedback"        element={<ProtectedRoute><FeedbackPage /></ProtectedRoute>} />
+        <Route path="quiz"            element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
