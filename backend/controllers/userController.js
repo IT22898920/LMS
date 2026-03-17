@@ -102,15 +102,57 @@ exports.toggleStatus = async (req, res) => {
 // @route  GET /api/users/stats
 exports.getStats = async (req, res) => {
   try {
-    const [total, admins, teachers, students, guardians, active] = await Promise.all([
-      User.countDocuments(),
+    const [total, admins, teachers, students, guardians, active, pending] = await Promise.all([
+      User.countDocuments({ isApproved: { $ne: false } }),
       User.countDocuments({ role: 'admin' }),
-      User.countDocuments({ role: 'teacher' }),
-      User.countDocuments({ role: 'student' }),
-      User.countDocuments({ role: 'guardian' }),
-      User.countDocuments({ isActive: true }),
+      User.countDocuments({ role: 'teacher', isApproved: { $ne: false } }),
+      User.countDocuments({ role: 'student', isApproved: { $ne: false } }),
+      User.countDocuments({ role: 'guardian', isApproved: { $ne: false } }),
+      User.countDocuments({ isActive: true, isApproved: { $ne: false } }),
+      User.countDocuments({ isApproved: false }),
     ]);
-    res.json({ success: true, stats: { total, admins, teachers, students, guardians, active, inactive: total - active } });
+    res.json({ success: true, stats: { total, admins, teachers, students, guardians, active, inactive: total - active, pending } });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @route  GET /api/users/pending
+exports.getPendingUsers = async (req, res) => {
+  try {
+    const users = await User.find({ isApproved: false }).sort({ createdAt: -1 });
+    res.json({ success: true, users, total: users.length });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @route  PUT /api/users/:id/approve
+exports.approveUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    user.isApproved = true;
+    user.approvedBy = req.user._id;
+    user.approvedAt = new Date();
+    user.rejectionReason = '';
+    await user.save();
+    await logActivity(req.user._id, 'APPROVE_USER', 'user', `Approved registration: ${user.email} (${user.role})`, req);
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @route  PUT /api/users/:id/reject
+exports.rejectUser = async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    await logActivity(req.user._id, 'REJECT_USER', 'user', `Rejected registration: ${user.email} — ${reason || 'No reason given'}`, req);
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Registration rejected and removed' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

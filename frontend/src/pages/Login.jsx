@@ -194,9 +194,17 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="text-center text-xs text-gray-400 mt-8">
-            eduCare LMS — Educational Relationship Management Platform
-          </p>
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500">
+              New to eduCare?{' '}
+              <Link to="/register" className="text-primary-600 font-semibold hover:text-primary-700 transition-colors">
+                Create an account
+              </Link>
+            </p>
+            <p className="text-xs text-gray-400 mt-3">
+              eduCare LMS — Educational Relationship Management Platform
+            </p>
+          </div>
         </div>
       </div>
     </div>

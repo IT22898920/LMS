@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const User = require('./models/User');
 
 const USERS = [
-  { name: 'Admin User',      email: 'admin@lms.com',    password: 'admin123',    role: 'admin' },
-  { name: 'Sarah Johnson',   email: 'teacher@lms.com',  password: 'teacher123',  role: 'teacher',  subjects: ['Mathematics', 'Science'] },
-  { name: 'Alex Fernando',   email: 'student@lms.com',  password: 'student123',  role: 'student',  studentId: 'STU-2025-001', grade: 'Grade 10A' },
-  { name: 'David Silva',     email: 'student2@lms.com', password: 'student123',  role: 'student',  studentId: 'STU-2025-002', grade: 'Grade 10B' },
-  { name: 'Maria Silva',     email: 'guardian@lms.com', password: 'guardian123', role: 'guardian', relationship: 'Mother' },
+  { name: 'Admin User',      email: 'admin@lms.com',    password: 'admin123',    role: 'admin',    isApproved: true, registrationType: 'admin' },
+  { name: 'Sarah Johnson',   email: 'teacher@lms.com',  password: 'teacher123',  role: 'teacher',  isApproved: true, registrationType: 'admin', subjects: ['Mathematics', 'Science'] },
+  { name: 'Alex Fernando',   email: 'student@lms.com',  password: 'student123',  role: 'student',  isApproved: true, registrationType: 'admin', studentId: 'STU-2025-001', grade: 'Grade 10A' },
+  { name: 'David Silva',     email: 'student2@lms.com', password: 'student123',  role: 'student',  isApproved: true, registrationType: 'admin', studentId: 'STU-2025-002', grade: 'Grade 10B' },
+  { name: 'Maria Silva',     email: 'guardian@lms.com', password: 'guardian123', role: 'guardian', isApproved: true, registrationType: 'admin', relationship: 'Mother' },
 ];
 
 async function seed() {

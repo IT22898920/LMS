@@ -21,6 +21,8 @@ import ActivityLog from './pages/Activity/ActivityLog';
 import MaterialsPage from './pages/Materials/MaterialsPage';
 import FeedbackPage from './pages/Feedback/FeedbackPage';
 import QuizPage from './pages/Quiz/QuizPage';
+import ProgressPage from './pages/Progress/ProgressPage';
+import Register from './pages/Register';
 
 const DashboardRouter = () => {
   const { user } = useAuth();
@@ -65,7 +67,8 @@ function AppRoutes() {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Landing />} />
-      <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/login"    element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <Register />} />
 
       {/* Protected app routes */}
       <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
@@ -83,6 +86,7 @@ function AppRoutes() {
         <Route path="materials"       element={<ProtectedRoute><MaterialsPage /></ProtectedRoute>} />
         <Route path="feedback"        element={<ProtectedRoute><FeedbackPage /></ProtectedRoute>} />
         <Route path="quiz"            element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+        <Route path="progress"        element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

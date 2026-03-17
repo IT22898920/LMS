@@ -19,7 +19,7 @@ const logActivity = async (userId, action, category, details, req, status = 'suc
   } catch {}
 };
 
-// @desc   Register user (Admin only in production; open for seeding)
+// @desc   Register user — admin creates (auto-approved, gets token)
 // @route  POST /api/auth/register
 exports.register = async (req, res) => {
   try {
@@ -31,12 +31,48 @@ exports.register = async (req, res) => {
     const user = await User.create({
       name, email, password, role: role || 'student',
       phone, studentId, grade, subjects, relationship,
+      isApproved: true, registrationType: 'admin',
     });
     await logActivity(user._id, 'REGISTER', 'auth', `New ${user.role} registered: ${user.email}`, req);
+    res.status(201).json({ success: true, token: generateToken(user._id), user });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @desc   Public self-registration — pending admin approval
+// @route  POST /api/auth/public-register
+exports.publicRegister = async (req, res) => {
+  try {
+    const { name, email, password, role, phone, studentId, grade, subjects, relationship } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Name, email and password are required' });
+    }
+    if (!['teacher', 'student', 'guardian'].includes(role)) {
+      return res.status(400).json({ success: false, message: 'Invalid role. Choose teacher, student, or guardian.' });
+    }
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'Email already registered' });
+    }
+
+    const user = await User.create({
+      name, email, password,
+      role,
+      phone: phone || '',
+      studentId: studentId || '',
+      grade: grade || '',
+      subjects: subjects || [],
+      relationship: relationship || '',
+      isApproved: false,
+      registrationType: 'self',
+    });
+
+    await logActivity(user._id, 'SELF_REGISTER', 'auth', `Self-registration request: ${user.email} (${user.role})`, req);
     res.status(201).json({
       success: true,
-      token: generateToken(user._id),
-      user,
+      message: 'Registration submitted successfully! An admin will review and approve your account.',
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -58,6 +94,9 @@ exports.login = async (req, res) => {
     }
     if (!user.isActive) {
       return res.status(403).json({ success: false, message: 'Account is deactivated' });
+    }
+    if (user.isApproved === false) {
+      return res.status(403).json({ success: false, message: 'Your account is pending admin approval. You will be notified once approved.', pendingApproval: true });
     }
     user.lastLogin = new Date();
     await user.save({ validateBeforeSave: false });
