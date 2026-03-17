@@ -9,15 +9,30 @@ const materialSchema = new mongoose.Schema(
     week: { type: Number, default: null },
     academicYear: { type: String, default: '' },
 
-    // File info
-    fileName: { type: String, required: true },   // original filename
-    fileKey: { type: String, required: true },     // stored filename (unique)
-    fileUrl: { type: String, required: true },     // accessible URL
+    // Content type - file, youtube, or external link
+    contentType: {
+      type: String,
+      enum: ['file', 'youtube', 'link'],
+      default: 'file',
+    },
+
+    // For YouTube videos
+    youtubeUrl: { type: String, default: '' },
+    youtubeId: { type: String, default: '' },      // extracted video ID
+    thumbnailUrl: { type: String, default: '' },   // YouTube thumbnail
+
+    // For external links
+    externalUrl: { type: String, default: '' },
+
+    // File info (for contentType: 'file')
+    fileName: { type: String, default: '' },       // original filename
+    fileKey: { type: String, default: '' },        // stored filename (unique)
+    fileUrl: { type: String, default: '' },        // accessible URL
     fileSize: { type: Number, default: 0 },        // bytes
     mimeType: { type: String, default: '' },
     fileType: {
       type: String,
-      enum: ['pdf', 'doc', 'ppt', 'image', 'video', 'spreadsheet', 'other'],
+      enum: ['pdf', 'doc', 'ppt', 'image', 'video', 'spreadsheet', 'youtube', 'link', 'other'],
       default: 'other',
     },
 

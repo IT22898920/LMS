@@ -20,7 +20,8 @@ const ROLE_GRADIENT = {
 export default function Navbar({ onMenuClick }) {
   const { user } = useAuth();
   const [showSearch, setShowSearch] = useState(false);
-  const meta = ROLE_META[user?.role] || ROLE_META.student;
+  const roleName = typeof user?.role === 'object' ? user?.role?.name : user?.role;
+  const meta = ROLE_META[roleName] || ROLE_META.student;
 
   return (
     <header className="h-16 bg-white/80 backdrop-blur-xl border-b border-gray-100 flex items-center px-5 gap-4 flex-shrink-0 z-10 sticky top-0">
@@ -79,7 +80,7 @@ export default function Navbar({ onMenuClick }) {
 
         {/* User chip */}
         <div className="flex items-center gap-2.5 pl-1">
-          <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${ROLE_GRADIENT[user?.role] || 'from-gray-400 to-gray-600'} flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm`}>
+          <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${ROLE_GRADIENT[roleName] || 'from-gray-400 to-gray-600'} flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm`}>
             {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div className="hidden sm:block">
@@ -87,7 +88,7 @@ export default function Navbar({ onMenuClick }) {
             <div className="flex items-center gap-1.5 mt-1">
               <div className={`w-1.5 h-1.5 rounded-full ${meta.dot}`} />
               <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full border capitalize ${meta.badge}`}>
-                {user?.role}
+                {roleName}
               </span>
             </div>
           </div>

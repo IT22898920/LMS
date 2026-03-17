@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, Users, Link2, FileText, Users2,
   Activity, LogOut, GraduationCap, Shield, BookOpen,
-  ChevronRight, Heart, BookMarked, MessageSquare, ClipboardList,
+  ChevronRight, Heart, BookMarked, MessageSquare, ClipboardList, BarChart3, Layers,
 } from 'lucide-react';
 
 const ROLE_COLORS = {
@@ -18,9 +18,11 @@ const ROLE_ICONS = { admin: Shield, teacher: BookOpen, student: GraduationCap, g
 const navItems = {
   admin: [
     { to: '/dashboard',            label: 'Dashboard',       icon: LayoutDashboard },
+    { to: '/dashboard/courses',    label: 'Courses',         icon: Layers },
     { to: '/dashboard/users',      label: 'User Management', icon: Users },
     { to: '/dashboard/guardians',  label: 'Guardian Links',  icon: Link2 },
     { to: '/dashboard/materials',  label: 'Content Manager', icon: BookMarked },
+    { to: '/dashboard/progress',   label: 'Progress Analytics', icon: BarChart3 },
     { to: '/dashboard/reports',    label: 'Reports',         icon: FileText },
     { to: '/dashboard/groups',     label: 'Learning Groups', icon: Users2 },
     { to: '/dashboard/activity',   label: 'Activity Monitor',icon: Activity },
@@ -29,7 +31,9 @@ const navItems = {
   ],
   teacher: [
     { to: '/dashboard',            label: 'Dashboard',       icon: LayoutDashboard },
+    { to: '/dashboard/courses',    label: 'Courses',         icon: Layers },
     { to: '/dashboard/materials',  label: 'Content Manager', icon: BookMarked },
+    { to: '/dashboard/progress',   label: 'Progress Analytics', icon: BarChart3 },
     { to: '/dashboard/guardians',  label: 'Guardian Links',  icon: Link2 },
     { to: '/dashboard/reports',    label: 'Reports',         icon: FileText },
     { to: '/dashboard/groups',     label: 'Learning Groups', icon: Users2 },
@@ -39,6 +43,7 @@ const navItems = {
   ],
   student: [
     { to: '/dashboard',            label: 'Dashboard',       icon: LayoutDashboard },
+    { to: '/dashboard/courses',    label: 'My Courses',      icon: Layers },
     { to: '/dashboard/materials',  label: 'Study Materials', icon: BookMarked },
     { to: '/dashboard/reports',    label: 'My Reports',      icon: FileText },
     { to: '/dashboard/groups',     label: 'Learning Groups', icon: Users2 },
@@ -56,9 +61,10 @@ const navItems = {
 export default function Sidebar({ open, onClose }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const items = navItems[user?.role] || [];
-  const colors = ROLE_COLORS[user?.role] || ROLE_COLORS.admin;
-  const RoleIcon = ROLE_ICONS[user?.role] || Shield;
+  const roleName = typeof user?.role === 'object' ? user?.role?.name : user?.role;
+  const items = navItems[roleName] || [];
+  const colors = ROLE_COLORS[roleName] || ROLE_COLORS.admin;
+  const RoleIcon = ROLE_ICONS[roleName] || Shield;
 
   const handleLogout = () => { logout(); navigate('/'); };
   const avatarLetter = user?.name?.charAt(0).toUpperCase() || 'U';
@@ -91,7 +97,7 @@ export default function Sidebar({ open, onClose }) {
                 <p className="text-white font-semibold text-sm truncate leading-none">{user?.name}</p>
                 <div className="flex items-center gap-1 mt-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  <p className="text-white/70 text-xs capitalize">{user?.role}</p>
+                  <p className="text-white/70 text-xs capitalize">{roleName}</p>
                 </div>
               </div>
               <RoleIcon size={14} className="text-white/50 flex-shrink-0" />

@@ -5,7 +5,7 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
 const {
-  getMaterials, getMaterial, uploadMaterial, updateMaterial,
+  getMaterials, getMaterial, uploadMaterial, createUrlMaterial, updateMaterial,
   approveMaterial, archiveMaterial, restoreMaterial,
   downloadMaterial, deleteMaterial, getStats,
 } = require('../controllers/materialController');
@@ -47,6 +47,7 @@ router.get('/',                      protect, getMaterials);
 router.get('/:id',                   protect, getMaterial);
 router.get('/:id/download',          protect, downloadMaterial);
 router.post('/',                     protect, authorize('admin', 'teacher'), upload.single('file'), uploadMaterial);
+router.post('/url',                  protect, authorize('admin', 'teacher'), createUrlMaterial);
 router.put('/:id',                   protect, authorize('admin', 'teacher'), updateMaterial);
 router.put('/:id/approve',           protect, authorize('admin'), approveMaterial);
 router.put('/:id/archive',           protect, authorize('admin'), archiveMaterial);

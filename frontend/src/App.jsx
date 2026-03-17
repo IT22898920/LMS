@@ -21,6 +21,8 @@ import ActivityLog from './pages/Activity/ActivityLog';
 import MaterialsPage from './pages/Materials/MaterialsPage';
 import FeedbackPage from './pages/Feedback/FeedbackPage';
 import QuizPage from './pages/Quiz/QuizPage';
+import ProgressDashboard from './pages/Progress/ProgressDashboard';
+import CoursesPage from './pages/Courses/CoursesPage';
 
 const DashboardRouter = () => {
   const { user } = useAuth();
@@ -81,6 +83,8 @@ function AppRoutes() {
         <Route path="groups/:id"      element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
         <Route path="activity"        element={<ProtectedRoute><ActivityLog /></ProtectedRoute>} />
         <Route path="materials"       element={<ProtectedRoute><MaterialsPage /></ProtectedRoute>} />
+        <Route path="progress"        element={<ProtectedRoute roles={['admin','teacher']}><ProgressDashboard /></ProtectedRoute>} />
+        <Route path="courses"         element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
         <Route path="feedback"        element={<ProtectedRoute><FeedbackPage /></ProtectedRoute>} />
         <Route path="quiz"            element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
       </Route>

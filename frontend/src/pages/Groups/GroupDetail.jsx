@@ -106,7 +106,7 @@ export default function GroupDetail() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-gray-900 text-sm truncate">{m.user?.name}</p>
-                <p className="text-xs text-gray-400 truncate">{m.user?.role}</p>
+                <p className="text-xs text-gray-400 truncate">{typeof m.user?.role === 'object' ? m.user?.role?.name : m.user?.role}</p>
               </div>
               <div className="flex items-center gap-1">
                 {m.role === 'owner' && <Crown size={13} className="text-amber-500" />}

@@ -3,10 +3,19 @@ import api from '../utils/api';
 
 const AuthContext = createContext(null);
 
+// Normalize user object - convert role object to string if needed
+const normalizeUser = (user) => {
+  if (!user) return null;
+  return {
+    ...user,
+    role: typeof user.role === 'object' ? user.role?.name : user.role,
+  };
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem('user');
-    return stored ? JSON.parse(stored) : null;
+    return stored ? normalizeUser(JSON.parse(stored)) : null;
   });
   const [loading, setLoading] = useState(true);
 
@@ -14,7 +23,11 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       api.get('/auth/me')
-        .then((res) => { setUser(res.data.user); localStorage.setItem('user', JSON.stringify(res.data.user)); })
+        .then((res) => {
+          const normalized = normalizeUser(res.data.user);
+          setUser(normalized);
+          localStorage.setItem('user', JSON.stringify(normalized));
+        })
         .catch(() => { localStorage.removeItem('token'); localStorage.removeItem('user'); setUser(null); })
         .finally(() => setLoading(false));
     } else {
@@ -24,10 +37,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password });
+    const normalized = normalizeUser(data.user);
     localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
-    setUser(data.user);
-    return data.user;
+    localStorage.setItem('user', JSON.stringify(normalized));
+    setUser(normalized);
+    return normalized;
   };
 
   const logout = () => {
@@ -37,8 +51,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateUser = (updatedUser) => {
-    setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+    const normalized = normalizeUser(updatedUser);
+    setUser(normalized);
+    localStorage.setItem('user', JSON.stringify(normalized));
   };
 
   return (

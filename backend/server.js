@@ -28,6 +28,8 @@ app.use('/api/activity',   require('./routes/activity'));
 app.use('/api/materials',  require('./routes/materials'));
 app.use('/api/feedback',   require('./routes/feedback'));
 app.use('/api/quiz',       require('./routes/quiz'));
+app.use('/api/progress',   require('./routes/progress'));
+app.use('/api/courses',    require('./routes/courses'));
 
 app.get('/', (req, res) => res.json({ message: 'LMS ERM API Running' }));
 

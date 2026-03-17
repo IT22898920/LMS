@@ -20,6 +20,25 @@ const detectFileType = (mime) => {
   return 'other';
 };
 
+// Extract YouTube video ID from various URL formats
+const extractYouTubeId = (url) => {
+  if (!url) return null;
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
+    /^([a-zA-Z0-9_-]{11})$/, // Direct video ID
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+};
+
+// Get YouTube thumbnail URL
+const getYouTubeThumbnail = (videoId) => {
+  return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+};
+
 // @route  GET /api/materials
 exports.getMaterials = async (req, res) => {
   try {
@@ -112,7 +131,7 @@ exports.getMaterial = async (req, res) => {
   }
 };
 
-// @route  POST /api/materials  (multipart/form-data)
+// @route  POST /api/materials  (multipart/form-data for files)
 exports.uploadMaterial = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
@@ -132,6 +151,7 @@ exports.uploadMaterial = async (req, res) => {
       tags: tags ? tags.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean) : [],
       version: version || '1.0',
       replacesVersion: replacesVersion || null,
+      contentType: 'file',
       fileName: req.file.originalname,
       fileKey: req.file.filename,
       fileUrl,
@@ -146,6 +166,89 @@ exports.uploadMaterial = async (req, res) => {
 
     await material.populate('uploadedBy', 'name email role');
     await log(req.user._id, 'UPLOAD_MATERIAL', `Uploaded: "${title}" (${subject})`, req);
+
+    // If this replaces a previous version, archive the old one
+    if (replacesVersion) {
+      await Material.findByIdAndUpdate(replacesVersion, {
+        status: 'archived',
+        archivedBy: req.user._id,
+        archivedAt: new Date(),
+        archivedReason: `Replaced by newer version: ${title} v${version}`,
+      });
+    }
+
+    res.status(201).json({ success: true, material });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// @route  POST /api/materials/url  (for YouTube/external links - JSON body)
+exports.createUrlMaterial = async (req, res) => {
+  try {
+    const {
+      title, description, subject, module: mod, week, academicYear,
+      tags, version, replacesVersion, contentType, youtubeUrl, externalUrl
+    } = req.body;
+
+    if (!title || !subject) {
+      return res.status(400).json({ success: false, message: 'Title and subject are required' });
+    }
+
+    if (!contentType || !['youtube', 'link'].includes(contentType)) {
+      return res.status(400).json({ success: false, message: 'Invalid content type. Use "youtube" or "link"' });
+    }
+
+    let materialData = {
+      title, description, subject,
+      module: mod || '',
+      week: week ? Number(week) : null,
+      academicYear: academicYear || new Date().getFullYear().toString(),
+      tags: tags ? (Array.isArray(tags) ? tags : tags.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean)) : [],
+      version: version || '1.0',
+      replacesVersion: replacesVersion || null,
+      contentType,
+      uploadedBy: req.user._id,
+      status: req.user.role === 'admin' ? 'approved' : 'pending',
+      approvedBy: req.user.role === 'admin' ? req.user._id : null,
+      approvedAt: req.user.role === 'admin' ? new Date() : null,
+    };
+
+    // Handle YouTube content
+    if (contentType === 'youtube') {
+      if (!youtubeUrl) {
+        return res.status(400).json({ success: false, message: 'YouTube URL is required' });
+      }
+      const videoId = extractYouTubeId(youtubeUrl);
+      if (!videoId) {
+        return res.status(400).json({ success: false, message: 'Invalid YouTube URL' });
+      }
+      materialData.youtubeUrl = youtubeUrl;
+      materialData.youtubeId = videoId;
+      materialData.thumbnailUrl = getYouTubeThumbnail(videoId);
+      materialData.fileType = 'youtube';
+    }
+
+    // Handle external link
+    if (contentType === 'link') {
+      if (!externalUrl) {
+        return res.status(400).json({ success: false, message: 'External URL is required' });
+      }
+      // Basic URL validation
+      try {
+        new URL(externalUrl);
+      } catch {
+        return res.status(400).json({ success: false, message: 'Invalid URL format' });
+      }
+      materialData.externalUrl = externalUrl;
+      materialData.fileType = 'link';
+    }
+
+    const material = await Material.create(materialData);
+    await material.populate('uploadedBy', 'name email role');
+
+    const actionType = contentType === 'youtube' ? 'ADD_YOUTUBE' : 'ADD_LINK';
+    await log(req.user._id, actionType, `Added ${contentType}: "${title}" (${subject})`, req);
 
     // If this replaces a previous version, archive the old one
     if (replacesVersion) {

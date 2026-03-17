@@ -147,7 +147,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-800 truncate">{log.details || log.action}</p>
-                  <p className="text-xs text-gray-400">{log.user?.name} · {log.user?.role} · {new Date(log.createdAt).toLocaleString()}</p>
+                  <p className="text-xs text-gray-400">{log.user?.name} · {typeof log.user?.role === 'object' ? log.user?.role?.name : log.user?.role} · {new Date(log.createdAt).toLocaleString()}</p>
                 </div>
                 <span className={`badge ${log.status === 'success' ? 'bg-emerald-100 text-emerald-700' : log.status === 'failed' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
                   {log.status}
