@@ -1,22 +1,37 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { GraduationCap, Eye, EyeOff, LogIn, BookOpen, Users2, ArrowLeft, Heart } from 'lucide-react';
+import {
+  GraduationCap, Eye, EyeOff, LogIn, BookOpen,
+  Heart, ArrowLeft, Sparkles, CheckCircle2, Shield,
+} from 'lucide-react';
 
 const QUICK_ACCOUNTS = [
-  { role: 'teacher',  email: 'teacher@lms.com',  password: 'teacher123',  icon: BookOpen,      color: 'from-blue-500 to-cyan-500',       label: 'Teacher' },
-  { role: 'student',  email: 'student@lms.com',  password: 'student123',  icon: GraduationCap, color: 'from-emerald-500 to-teal-500',   label: 'Student' },
-  { role: 'guardian', email: 'guardian@lms.com', password: 'guardian123', icon: Heart,         color: 'from-orange-500 to-amber-500',    label: 'Guardian' },
+  { role: 'admin',    email: 'admin@lms.com',    password: 'admin123',    icon: Shield,        gradient: 'from-violet-600 to-indigo-700', label: 'Admin' },
+  { role: 'teacher',  email: 'teacher@lms.com',  password: 'teacher123',  icon: BookOpen,      gradient: 'from-blue-600 to-cyan-600',     label: 'Teacher' },
+  { role: 'student',  email: 'student@lms.com',  password: 'student123',  icon: GraduationCap, gradient: 'from-emerald-500 to-teal-600',  label: 'Student' },
+  { role: 'guardian', email: 'guardian@lms.com', password: 'guardian123', icon: Heart,         gradient: 'from-orange-500 to-amber-500',  label: 'Guardian' },
 ];
+
+const Orb = ({ className, style, delay = 0 }) => (
+  <motion.div
+    className={`absolute rounded-full pointer-events-none ${className}`}
+    animate={{ y: [0, -20, 0], scale: [1, 1.05, 1] }}
+    transition={{ repeat: Infinity, duration: 7 + delay, ease: 'easeInOut', delay }}
+    style={style}
+  />
+);
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+  const [activeRole, setActiveRole] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,67 +50,149 @@ export default function Login() {
   const quickLogin = (acc) => {
     setEmail(acc.email);
     setPassword(acc.password);
+    setActiveRole(acc.role);
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-600 via-violet-700 to-purple-800 relative overflow-hidden flex-col justify-between p-12">
-        {/* Decorative blobs */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
 
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-16">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                <GraduationCap size={26} className="text-white" />
-              </div>
+      {/* ── Left panel ─────────────────────────────────────────────────────── */}
+      <div className="hidden lg:flex lg:w-[52%] relative overflow-hidden flex-col"
+        style={{ background: 'linear-gradient(135deg, #0f0c29 0%, #1e1b4b 30%, #312e81 65%, #4c1d95 100%)' }}
+      >
+        {/* Animated gradient overlay */}
+        <motion.div
+          className="absolute inset-0 opacity-30"
+          animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+          style={{
+            background: 'linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899, #6366f1)',
+            backgroundSize: '400% 400%',
+          }}
+        />
+
+        {/* Orbs */}
+        <Orb className="w-72 h-72 -top-16 -left-16 opacity-25" style={{ background: 'radial-gradient(circle, #8b5cf6, transparent 70%)' }} delay={0} />
+        <Orb className="w-64 h-64 top-1/2 -right-12 opacity-20" style={{ background: 'radial-gradient(circle, #ec4899, transparent 70%)' }} delay={2} />
+        <Orb className="w-56 h-56 bottom-10 left-1/4 opacity-20" style={{ background: 'radial-gradient(circle, #6366f1, transparent 70%)' }} delay={4} />
+
+        {/* Grid */}
+        <div className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col h-full p-12">
+          {/* Top: logo + back */}
+          <div className="flex items-center justify-between">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="flex items-center gap-3"
+            >
+              <motion.div
+                className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center border border-white/20 backdrop-blur-sm"
+                whileHover={{ scale: 1.08, rotate: 6 }}
+                transition={{ type: 'spring', stiffness: 400 }}
+              >
+                <GraduationCap size={24} className="text-white" />
+              </motion.div>
               <div>
-                <h1 className="text-white font-bold text-xl">eduCare LMS</h1>
-                <p className="text-white/60 text-sm">ERM Platform</p>
+                <p className="text-white font-black text-base leading-none">eduCare LMS</p>
+                <p className="text-white/50 text-xs mt-0.5">ERM Platform</p>
               </div>
-            </div>
-            <Link to="/" className="flex items-center gap-1.5 text-white/60 hover:text-white text-sm transition-colors">
-              <ArrowLeft size={14} /> Back to home
-            </Link>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Link to="/" className="flex items-center gap-1.5 text-white/50 hover:text-white text-sm transition-colors">
+                <ArrowLeft size={14} /> Back to home
+              </Link>
+            </motion.div>
           </div>
 
-          <div className="space-y-6">
-            <h2 className="text-4xl font-bold text-white leading-tight">
-              Empowering<br />Education<br />Together
+          {/* Middle: headline */}
+          <motion.div
+            className="flex-1 flex flex-col justify-center"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.55 }}
+          >
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold mb-6 w-fit"
+              style={{ background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.4)', color: '#c7d2fe' }}
+            >
+              <Sparkles size={11} className="text-indigo-300" />
+              Welcome back
+            </div>
+
+            <h2 className="text-5xl font-black text-white leading-[1.1] mb-5">
+              Empowering<br />
+              <span style={{
+                background: 'linear-gradient(135deg, #a5b4fc, #f0abfc)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>Education</span><br />
+              Together
             </h2>
-            <p className="text-white/70 text-base leading-relaxed max-w-sm">
+            <p className="text-white/60 text-base leading-relaxed max-w-sm">
               A unified platform connecting admins, teachers, students, and guardians through
               intelligent relationship management.
             </p>
-          </div>
-        </div>
 
-        {/* Feature list */}
-        <div className="relative z-10 grid grid-cols-2 gap-3">
-          {[
-            { label: 'Guardian–Student Linking', desc: 'Smart family connections' },
-            { label: 'Role-Based Access', desc: 'Fine-grained permissions' },
-            { label: 'Academic Reports', desc: 'Detailed performance data' },
-            { label: 'Learning Communities', desc: 'Self-enrolled groups' },
-          ].map((f) => (
-            <div key={f.label} className="bg-white/10 rounded-xl p-3">
-              <p className="text-white font-semibold text-sm">{f.label}</p>
-              <p className="text-white/60 text-xs mt-0.5">{f.desc}</p>
+            {/* Features */}
+            <div className="mt-8 space-y-3">
+              {[
+                'Guardian–Student Linking with smart permissions',
+                'Role-Based Access for all stakeholders',
+                'Academic Reports with GPA & attendance tracking',
+                'Learning Communities & Quiz Management',
+              ].map((f, i) => (
+                <motion.div
+                  key={i}
+                  className="flex items-center gap-2.5 text-sm text-white/65"
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 + i * 0.07, duration: 0.4 }}
+                >
+                  <CheckCircle2 size={14} className="text-emerald-400 flex-shrink-0" />
+                  {f}
+                </motion.div>
+              ))}
             </div>
-          ))}
+          </motion.div>
+
+          {/* Bottom: version */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="text-white/25 text-xs"
+          >
+            eduCare LMS v1.0 · © 2026
+          </motion.p>
         </div>
       </div>
 
-      {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
-        <div className="w-full max-w-md">
+      {/* ── Right panel ────────────────────────────────────────────────────── */}
+      <div className="flex-1 flex items-center justify-center p-8" style={{ background: '#f5f4fc' }}>
+        <motion.div
+          className="w-full max-w-md"
+          initial={{ opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+        >
           {/* Mobile logo */}
           <div className="flex items-center justify-between mb-8 lg:hidden">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-violet-700 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-xl flex items-center justify-center">
                 <GraduationCap size={22} className="text-white" />
               </div>
               <div>
@@ -108,41 +205,78 @@ export default function Login() {
             </Link>
           </div>
 
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900">Welcome back</h2>
+          {/* Header */}
+          <div className="mb-7">
+            <h2 className="text-2xl font-black text-gray-900">Welcome back</h2>
             <p className="text-gray-500 mt-1 text-sm">Sign in to your account to continue</p>
           </div>
 
-          {/* Quick login cards — Teacher / Student / Guardian only */}
-          <div className="grid grid-cols-3 gap-2 mb-6">
-            {QUICK_ACCOUNTS.map((acc) => {
-              const Icon = acc.icon;
-              return (
-                <button
-                  key={acc.role}
-                  onClick={() => quickLogin(acc)}
-                  title={`Quick login as ${acc.label}`}
-                  className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-gray-200 hover:border-primary-300 hover:bg-primary-50 transition-all group"
-                >
-                  <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${acc.color} flex items-center justify-center shadow-sm`}>
-                    <Icon size={16} className="text-white" />
-                  </div>
-                  <span className="text-xs font-semibold text-gray-600 group-hover:text-primary-700">{acc.label}</span>
-                </button>
-              );
-            })}
+          {/* Quick login cards */}
+          <div className="mb-5">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Quick demo login</p>
+            <div className="grid grid-cols-4 gap-2">
+              {QUICK_ACCOUNTS.map((acc) => {
+                const Icon = acc.icon;
+                const isActive = activeRole === acc.role;
+                return (
+                  <motion.button
+                    key={acc.role}
+                    onClick={() => quickLogin(acc)}
+                    className="relative flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all"
+                    style={{
+                      background: isActive ? 'white' : 'rgba(255,255,255,0.7)',
+                      borderColor: isActive ? 'rgba(99,102,241,0.4)' : 'rgba(226,232,240,0.9)',
+                      boxShadow: isActive ? '0 4px 16px rgba(99,102,241,0.15)' : '0 1px 4px rgba(0,0,0,0.04)',
+                    }}
+                    whileHover={{ scale: 1.04, y: -2 }}
+                    whileTap={{ scale: 0.96 }}
+                  >
+                    <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${acc.gradient} flex items-center justify-center`}
+                      style={{ boxShadow: isActive ? '0 4px 12px rgba(99,102,241,0.3)' : '0 2px 6px rgba(0,0,0,0.1)' }}
+                    >
+                      <Icon size={16} className="text-white" />
+                    </div>
+                    <span className={`text-[10px] font-bold ${isActive ? 'text-indigo-600' : 'text-gray-500'}`}>{acc.label}</span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="roleActive"
+                        className="absolute inset-0 rounded-xl"
+                        style={{ border: '1.5px solid rgba(99,102,241,0.5)' }}
+                      />
+                    )}
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
-          <p className="text-xs text-gray-400 text-center mb-6">Click a role above to auto-fill credentials</p>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400 font-medium">or sign in manually</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl animate-slide-up">
-                {error}
-              </div>
-            )}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                  className="bg-red-50 border border-red-200/80 text-red-700 text-sm px-4 py-3 rounded-xl"
+                >
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+            >
               <label className="label">Email address</label>
               <input
                 type="email"
@@ -152,9 +286,13 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-            </div>
+            </motion.div>
 
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
               <label className="label">Password</label>
               <div className="relative">
                 <input
@@ -165,47 +303,70 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <button
+                <motion.button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                 >
                   {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
 
-            <button
+            <motion.button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary justify-center py-3 text-base font-semibold bg-gradient-to-r from-primary-600 to-violet-600 hover:from-primary-700 hover:to-violet-700 shadow-lg shadow-primary-500/25 border-0 mt-2"
+              className="w-full btn-primary justify-center py-3 text-base font-bold mt-2"
+              whileHover={!loading ? { scale: 1.01, y: -1 } : {}}
+              whileTap={!loading ? { scale: 0.98 } : {}}
             >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Signing in...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <LogIn size={18} />
-                  Sign In
-                </span>
-              )}
-            </button>
+              <AnimatePresence mode="wait">
+                {loading ? (
+                  <motion.span
+                    key="loading"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <motion.span
+                      className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                      animate={{ rotate: 360 }}
+                      transition={{ repeat: Infinity, duration: 0.7, ease: 'linear' }}
+                    />
+                    Signing in…
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="idle"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex items-center gap-2"
+                  >
+                    <LogIn size={17} /> Sign In
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.button>
           </form>
 
-          <div className="mt-6 text-center">
+          <motion.div
+            className="mt-6 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
             <p className="text-sm text-gray-500">
               New to eduCare?{' '}
               <Link to="/register" className="text-primary-600 font-semibold hover:text-primary-700 transition-colors">
                 Create an account
               </Link>
             </p>
-            <p className="text-xs text-gray-400 mt-3">
-              eduCare LMS — Educational Relationship Management Platform
-            </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );

@@ -13,7 +13,8 @@
       "Bash(cd C:/Users/USER/Documents/ITPM_LMS/LMS/backend && npm install uuid 2>&1 | tail -3)",
       "Bash(cd C:/Users/USER/Documents/ITPM_LMS/LMS/frontend && npm run build 2>&1 | tail -15)",
       "Bash(cd C:/Users/USER/Documents/ITPM_LMS/LMS && node -e \"\nconst fs = require\\('fs'\\);\nconst files = [\n  'frontend/src/App.jsx',\n  'frontend/src/components/Layout/Sidebar.jsx',\n  'frontend/src/pages/Landing.jsx',\n  'frontend/src/pages/Login.jsx',\n  'frontend/index.html',\n];\nfiles.forEach\\(f => {\n  let c = fs.readFileSync\\(f, 'utf8'\\);\n  c = c.replace\\(/EduConnect LMS/g, 'ecuCare LMS'\\);\n  c = c.replace\\(/EduConnect/g, 'ecuCare'\\);\n  c = c.replace\\(/educonnect/g, 'ecucare'\\);\n  fs.writeFileSync\\(f, c\\);\n  console.log\\('Updated:', f\\);\n}\\);\n\")",
-      "Bash(cd C:/Users/USER/Documents/ITPM_LMS/LMS && node -e \"\nconst fs = require\\('fs'\\);\nconst files = [\n  'frontend/src/App.jsx',\n  'frontend/src/components/Layout/Sidebar.jsx',\n  'frontend/src/pages/Landing.jsx',\n  'frontend/src/pages/Login.jsx',\n  'frontend/index.html',\n];\nfiles.forEach\\(f => {\n  let c = fs.readFileSync\\(f, 'utf8'\\);\n  c = c.replace\\(/ecuCare/g, 'eduCare'\\);\n  c = c.replace\\(/ecucare/g, 'educare'\\);\n  fs.writeFileSync\\(f, c\\);\n  console.log\\('Updated:', f\\);\n}\\);\n\")"
+      "Bash(cd C:/Users/USER/Documents/ITPM_LMS/LMS && node -e \"\nconst fs = require\\('fs'\\);\nconst files = [\n  'frontend/src/App.jsx',\n  'frontend/src/components/Layout/Sidebar.jsx',\n  'frontend/src/pages/Landing.jsx',\n  'frontend/src/pages/Login.jsx',\n  'frontend/index.html',\n];\nfiles.forEach\\(f => {\n  let c = fs.readFileSync\\(f, 'utf8'\\);\n  c = c.replace\\(/ecuCare/g, 'eduCare'\\);\n  c = c.replace\\(/ecucare/g, 'educare'\\);\n  fs.writeFileSync\\(f, c\\);\n  console.log\\('Updated:', f\\);\n}\\);\n\")",
+      "Bash(cd:*)"
     ]
   }
 }

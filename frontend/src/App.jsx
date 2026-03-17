@@ -43,34 +43,35 @@ const ProtectedRoute = ({ children, roles }) => {
 };
 
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50">
-    <div className="flex flex-col items-center gap-3">
-      <div className="w-10 h-10 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
-      <p className="text-sm text-gray-500 font-medium">Loading...</p>
+  <div
+    className="min-h-screen flex items-center justify-center"
+    style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%)' }}
+  >
+    <div className="flex flex-col items-center gap-4">
+      <div className="relative w-14 h-14">
+        <div className="absolute inset-0 rounded-full border-4 border-white/10" />
+        <div className="absolute inset-0 rounded-full border-4 border-t-white border-l-transparent border-r-transparent border-b-transparent animate-spin" />
+        <div className="absolute inset-2 rounded-full bg-white/10 flex items-center justify-center">
+          <div className="w-3 h-3 rounded-full bg-white animate-pulse" />
+        </div>
+      </div>
+      <p className="text-white/80 font-semibold text-base tracking-wide">eduCare LMS</p>
     </div>
   </div>
 );
 
 function AppRoutes() {
   const { user, loading } = useAuth();
-
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-600 to-purple-700">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin" />
-        <p className="text-white font-semibold text-lg">eduCare LMS</p>
-      </div>
-    </div>
-  );
+  if (loading) return <PageLoader />;
 
   return (
     <Routes>
-      {/* Public routes */}
-      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Landing />} />
+      {/* Public routes — each has its own entrance animation */}
+      <Route path="/"         element={user ? <Navigate to="/dashboard" replace /> : <Landing />} />
       <Route path="/login"    element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <Register />} />
 
-      {/* Protected app routes */}
+      {/* Protected dashboard — Layout persists, outlet animates (see Layout.jsx) */}
       <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<DashboardRouter />} />
         <Route path="users"           element={<ProtectedRoute roles={['admin']}><UserList /></ProtectedRoute>} />
