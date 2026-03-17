@@ -20,7 +20,9 @@
       "Bash(node seedMaterials.js:*)",
       "Bash(node seedCourses.js:*)",
       "Bash(node migrateProgressIndex.js:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npm install:*)"
     ]
   }
 }
