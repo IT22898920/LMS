@@ -183,6 +183,7 @@ const SubmitForm = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   const toggle = (k) => () => setForm((f) => ({ ...f, [k]: !f[k] }));
@@ -190,6 +191,7 @@ const SubmitForm = ({ onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.message.trim()) return setError('Please write your feedback message');
+    if (wordCount > 100) return setError('Feedback description must be 100 words or less');
     setError(''); setLoading(true);
     try {
       await api.post('/feedback', { ...form, rating: rating || null });
@@ -280,9 +282,16 @@ const SubmitForm = ({ onSuccess }) => {
                 rows={4}
                 placeholder="Describe your experience, suggestions, or concerns..."
                 value={form.message}
-                onChange={set('message')}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setForm((f) => ({ ...f, message: value }));
+                  setWordCount(value.trim().split(/\s+/).filter(word => word.length > 0).length);
+                }}
                 required
               />
+              <p className={`text-xs mt-1 ${wordCount > 100 ? 'text-red-500' : 'text-gray-400'}`}>
+                {wordCount}/100 words
+              </p>
             </div>
           </div>
 
@@ -302,7 +311,7 @@ const SubmitForm = ({ onSuccess }) => {
             </div>
           </label>
 
-          <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3 text-base font-semibold">
+          <button type="submit" disabled={loading || wordCount > 100} className="btn-primary w-full justify-center py-3 text-base font-semibold">
             {loading ? (
               <span className="flex items-center gap-2">
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
