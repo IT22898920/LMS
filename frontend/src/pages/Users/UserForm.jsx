@@ -40,10 +40,17 @@ export default function UserForm() {
     }
   }, [id, isEdit]);
 
+
+  // add validations for user managment phone number
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    if (form.phone && form.phone.length !== 10) {
+      setError('Phone number must be exactly 10 digits');
+      setLoading(false);
+      return;
+    }
     try {
       const payload = {
         ...form,
@@ -125,7 +132,17 @@ export default function UserForm() {
             </div>
             <div>
               <label className="label">Phone</label>
-              <input className="input" placeholder="+94 71 234 5678" value={form.phone} onChange={set('phone')} />
+              <input
+                className="input"
+                type="tel"
+                placeholder="0712345678"
+                value={form.phone}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                  setForm((f) => ({ ...f, phone: value }));
+                }}
+                maxLength={10}
+              />
             </div>
           </div>
           <div>
