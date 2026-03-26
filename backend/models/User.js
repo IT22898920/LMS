@@ -12,7 +12,16 @@ const userSchema = new mongoose.Schema(
       default: 'student',
     },
     avatar: { type: String, default: '' },
-    phone: { type: String, default: '' },
+    phone: {
+      type: String,
+      default: '',
+      validate: {
+        validator: function(v) {
+          return !v || /^\d{10}$/.test(v);
+        },
+        message: 'Phone number must be exactly 10 digits'
+      }
+    },
     address: { type: String, default: '' },
     isActive:         { type: Boolean, default: true },
     isApproved:       { type: Boolean, default: true },   // false = waiting admin approval
