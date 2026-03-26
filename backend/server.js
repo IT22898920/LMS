@@ -1,4 +1,6 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const cors = require('cors');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
@@ -9,6 +11,43 @@ dotenv.config();
 connectDB();
 
 const app = express();
+const server = http.createServer(app);
+
+// Socket.IO setup
+const io = new Server(server, {
+  cors: { origin: 'http://localhost:5173', credentials: true },
+});
+
+// Make io accessible to controllers via req.app.get('io')
+app.set('io', io);
+
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log(`Socket connected: ${socket.id}`);
+
+  // Join a ticket room for real-time chat
+  socket.on('ticket:join', (ticketId) => {
+    socket.join(`ticket:${ticketId}`);
+  });
+
+  // Leave a ticket room
+  socket.on('ticket:leave', (ticketId) => {
+    socket.leave(`ticket:${ticketId}`);
+  });
+
+  // Typing indicator
+  socket.on('ticket:typing', ({ ticketId, user }) => {
+    socket.to(`ticket:${ticketId}`).emit('ticket:typing', { ticketId, user });
+  });
+
+  socket.on('ticket:stopTyping', ({ ticketId, user }) => {
+    socket.to(`ticket:${ticketId}`).emit('ticket:stopTyping', { ticketId, user });
+  });
+
+  socket.on('disconnect', () => {
+    console.log(`Socket disconnected: ${socket.id}`);
+  });
+});
 
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
@@ -29,7 +68,8 @@ app.use('/api/materials',  require('./routes/materials'));
 app.use('/api/feedback',   require('./routes/feedback'));
 app.use('/api/quiz',       require('./routes/quiz'));
 app.use('/api/progress',   require('./routes/progress'));
-app.use('/api/courses',    require('./routes/courses'));
+app.use('/api/courses',           require('./routes/courses'));
+app.use('/api/support-tickets',  require('./routes/supportTickets'));
 
 app.get('/', (req, res) => res.json({ message: 'LMS ERM API Running' }));
 
@@ -40,4 +80,4 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

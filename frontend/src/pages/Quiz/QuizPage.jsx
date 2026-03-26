@@ -34,79 +34,91 @@ function QuizCard({ quiz, onTake, onEdit, onDelete, onPublish, isTeacher }) {
   const canRetake = quiz.allowRetake && (quiz.maxAttempts === 0 || quiz.attemptCount < quiz.maxAttempts);
 
   return (
-    <div className="card-hover group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 flex flex-col gap-3">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-gray-900 text-sm leading-snug truncate">{quiz.title}</h3>
-          {(quiz.subject || quiz.module) && (
-            <p className="text-xs text-gray-500 mt-0.5 truncate">{[quiz.subject, quiz.module].filter(Boolean).join(' · ')}</p>
+    <div className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+      {/* Gradient accent top */}
+      <div className={`h-1.5 bg-gradient-to-r ${quiz.isPublished !== false ? 'from-primary-500 to-purple-500' : 'from-amber-400 to-orange-400'}`} />
+
+      <div className="p-5 flex flex-col gap-3 flex-1">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-gray-900 text-sm leading-snug truncate group-hover:text-primary-700 transition-colors">{quiz.title}</h3>
+            {(quiz.subject || quiz.module) && (
+              <p className="text-xs text-gray-500 mt-0.5 truncate">{[quiz.subject, quiz.module].filter(Boolean).join(' · ')}</p>
+            )}
+          </div>
+          {canEdit && (
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button onClick={(e) => { e.stopPropagation(); onEdit(quiz); }} className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-blue-100 flex items-center justify-center text-gray-500 hover:text-blue-600 transition-colors">
+                <Pencil size={12} />
+              </button>
+              <button onClick={(e) => { e.stopPropagation(); onDelete(quiz._id); }} className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-red-100 flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors">
+                <Trash2 size={12} />
+              </button>
+            </div>
           )}
         </div>
-        {canEdit && (
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={() => onEdit(quiz)} className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-blue-100 flex items-center justify-center text-gray-500 hover:text-blue-600 transition-colors">
-              <Pencil size={12} />
-            </button>
-            <button onClick={() => onDelete(quiz._id)} className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-red-100 flex items-center justify-center text-gray-500 hover:text-red-600 transition-colors">
-              <Trash2 size={12} />
-            </button>
-          </div>
-        )}
-      </div>
 
-      {/* Meta */}
-      <div className="flex flex-wrap gap-1.5">
-        <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">
-          <ClipboardList size={10} />{quiz.questions?.length || 0} Qs
-        </span>
-        {quiz.timeLimit > 0 && (
-          <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">
-            <Clock size={10} />{quiz.timeLimit}m
+        {/* Meta badges */}
+        <div className="flex flex-wrap gap-1.5">
+          <span className="inline-flex items-center gap-1 text-xs text-gray-600 bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-lg font-medium">
+            <ClipboardList size={10} className="text-gray-400" />{quiz.questions?.length || 0} Qs
           </span>
-        )}
-        <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">
-          <Target size={10} />Pass: {quiz.passingScore}%
-        </span>
-        {isTeacher && (
-          <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${quiz.isPublished ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
-            {quiz.isPublished ? <Globe size={10} /> : <Lock size={10} />}
-            {quiz.isPublished ? 'Published' : 'Draft'}
+          {quiz.timeLimit > 0 && (
+            <span className="inline-flex items-center gap-1 text-xs text-blue-600 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-lg font-medium">
+              <Clock size={10} />{quiz.timeLimit}m
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1 text-xs text-purple-600 bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-lg font-medium">
+            <Target size={10} />Pass: {quiz.passingScore}%
           </span>
-        )}
-      </div>
-
-      {/* Attempt info (students) */}
-      {!isTeacher && attempted && (
-        <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-2.5">
-          <CheckCircle2 size={14} className="text-emerald-500 flex-shrink-0" />
-          <span className="text-xs text-gray-600">Best: <ScoreBadge pct={quiz.bestScore} /></span>
-          <span className="text-xs text-gray-400 ml-auto">{quiz.attemptCount} attempt{quiz.attemptCount !== 1 ? 's' : ''}</span>
+          {isTeacher && (
+            <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg font-medium border ${quiz.isPublished ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-amber-50 text-amber-700 border-amber-100'}`}>
+              {quiz.isPublished ? <Globe size={10} /> : <Lock size={10} />}
+              {quiz.isPublished ? 'Published' : 'Draft'}
+            </span>
+          )}
         </div>
-      )}
 
-      {/* Actions */}
-      <div className="flex gap-2 mt-auto pt-1">
-        {isTeacher ? (
-          <>
-            <button onClick={() => onPublish(quiz._id)} className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all ${quiz.isPublished ? 'bg-amber-50 text-amber-700 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'}`}>
-              {quiz.isPublished ? <Lock size={12} /> : <Globe size={12} />}
-              {quiz.isPublished ? 'Unpublish' : 'Publish'}
-            </button>
-            <button onClick={() => onEdit(quiz)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold bg-primary-50 text-primary-700 hover:bg-primary-100 transition-all">
-              <Pencil size={12} />Edit
-            </button>
-          </>
-        ) : attempted && !canRetake ? (
-          <div className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold bg-gray-100 text-gray-400 cursor-not-allowed">
-            <CheckCircle2 size={12} />Completed
+        {/* Attempt info (students) */}
+        {!isTeacher && attempted && (
+          <div className="flex items-center gap-2 bg-gradient-to-r from-gray-50 to-emerald-50/30 rounded-xl p-3 border border-gray-100">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+              <Trophy size={14} className="text-emerald-600" />
+            </div>
+            <div className="flex-1">
+              <span className="text-xs text-gray-600 font-medium">Best: <ScoreBadge pct={quiz.bestScore} /></span>
+            </div>
+            <span className="text-xs text-gray-400 font-medium">{quiz.attemptCount} attempt{quiz.attemptCount !== 1 ? 's' : ''}</span>
           </div>
-        ) : (
-          <button onClick={() => onTake(quiz)} className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all ${attempted ? 'bg-blue-50 text-blue-700 hover:bg-blue-100' : 'bg-gradient-to-r from-primary-500 to-purple-600 text-white hover:shadow-md'}`}>
-            {attempted ? <><RotateCcw size={12} />Retake</> : <><Play size={12} />Start Quiz</>}
-          </button>
         )}
+
+        {/* Actions */}
+        <div className="flex gap-2 mt-auto pt-2">
+          {isTeacher ? (
+            <>
+              <button onClick={() => onPublish(quiz._id)} className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${quiz.isPublished ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-100'}`}>
+                {quiz.isPublished ? <Lock size={12} /> : <Globe size={12} />}
+                {quiz.isPublished ? 'Unpublish' : 'Publish'}
+              </button>
+              <button onClick={() => onEdit(quiz)} className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold bg-primary-50 text-primary-700 hover:bg-primary-100 transition-all border border-primary-100">
+                <Pencil size={12} /> Edit
+              </button>
+            </>
+          ) : attempted && !canRetake ? (
+            <div className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-100">
+              <CheckCircle2 size={12} /> Completed
+            </div>
+          ) : (
+            <button onClick={() => onTake(quiz)} className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${attempted ? 'bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-100' : 'bg-gradient-to-r from-primary-500 to-purple-600 text-white hover:shadow-lg shadow-primary-500/20'}`}>
+              {attempted ? <><RotateCcw size={12} /> Retake</> : <><Play size={12} /> Start Quiz</>}
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Hover glow */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary-500/0 to-purple-500/0 group-hover:from-primary-500/[0.02] group-hover:to-purple-500/[0.04] transition-all duration-300 pointer-events-none" />
     </div>
   );
 }
@@ -688,25 +700,42 @@ export default function QuizPage() {
     : [{ id: 'manage', label: 'Manage Quizzes', icon: BookOpen }, { id: 'analytics', label: 'Analytics', icon: BarChart3 }];
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto">
-      {/* Page header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-black text-gray-900">Quiz Management</h1>
-          <p className="text-gray-500 text-sm mt-0.5">Progress Analyst — {isStudent ? 'Take quizzes and track your scores' : 'Create, manage, and analyze quizzes'}</p>
+    <div className="space-y-6 max-w-6xl">
+      {/* ── Premium Header ── */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-purple-600 to-violet-700 rounded-3xl p-6 sm:p-8">
+        <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/5 blur-xl" />
+        <div className="absolute top-6 right-16 w-16 h-16 rounded-full bg-purple-400/20" />
+
+        <div className="relative z-10 flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/10">
+              <ClipboardList size={24} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white">Quiz Management</h1>
+              <p className="text-white/70 text-sm mt-0.5">
+                {isStudent ? 'Take quizzes and track your scores' : 'Create, manage, and analyze quizzes'}
+              </p>
+            </div>
+          </div>
+          {isTeacher && (
+            <button onClick={() => setForming({})} className="flex items-center gap-2 px-5 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-xl font-semibold text-sm transition-all border border-white/10 shadow-lg">
+              <Plus size={16} /> New Quiz
+            </button>
+          )}
         </div>
-        {isTeacher && (
-          <button onClick={() => setForming({})} className="btn-primary flex items-center gap-2">
-            <Plus size={16} />New Quiz
-          </button>
-        )}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-100 rounded-2xl p-1 w-fit">
+      <div className="flex gap-1 bg-gray-100/80 backdrop-blur-sm rounded-2xl p-1.5 w-fit border border-gray-200/50">
         {tabs.map(({ id, label, icon: Icon }) => (
           <button key={id} onClick={() => setTab(id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${tab === id ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'}`}>
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+              tab === id
+                ? 'bg-white shadow-md shadow-primary-500/10 text-primary-700 border border-gray-100'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+            }`}>
             <Icon size={14} />{label}
           </button>
         ))}
@@ -744,34 +773,59 @@ export default function QuizPage() {
       {/* Manage / Browse tabs */}
       {(tab === 'manage' || tab === 'browse') && (
         <>
-          {/* Filters */}
-          <div className="flex flex-wrap gap-3">
-            <div className="relative flex-1 min-w-48">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search quizzes…" className="input pl-9 w-full text-sm" />
+          {/* ── Glass Filter Bar ── */}
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-sm p-4">
+            <div className="flex flex-wrap gap-3">
+              <div className="relative flex-1 min-w-52">
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  value={search} onChange={e => setSearch(e.target.value)}
+                  placeholder="Search quizzes…"
+                  className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50/50 focus:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-500/10 outline-none text-sm transition-all placeholder:text-gray-400"
+                />
+              </div>
+              {isTeacher && (
+                <select value={filter} onChange={e => setFilter(e.target.value)} className="input text-sm pr-8">
+                  <option value="">All Quizzes</option>
+                  <option value="mine">My Quizzes</option>
+                  <option value="published">Published</option>
+                  <option value="draft">Drafts</option>
+                </select>
+              )}
             </div>
-            {isTeacher && (
-              <select value={filter} onChange={e => setFilter(e.target.value)} className="input text-sm pr-8">
-                <option value="">All Quizzes</option>
-                <option value="mine">My Quizzes</option>
-                <option value="published">Published</option>
-                <option value="draft">Drafts</option>
-              </select>
-            )}
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center py-24">
-              <Loader2 size={32} className="animate-spin text-primary-500" />
+            <div className="flex items-center justify-center py-28">
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative">
+                  <div className="w-14 h-14 border-4 border-primary-100 rounded-full" />
+                  <div className="absolute inset-0 w-14 h-14 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+                <p className="text-sm text-gray-400 font-medium">Loading quizzes...</p>
+              </div>
             </div>
           ) : quizzes.length === 0 ? (
-            <div className="text-center py-20 bg-gray-50 rounded-2xl">
-              <BookOpen size={40} className="text-gray-200 mx-auto mb-3" />
-              <p className="text-gray-500 font-semibold">No quizzes found</p>
-              {isTeacher && <button onClick={() => setForming({})} className="mt-3 btn-primary text-sm">Create Your First Quiz</button>}
+            <div className="relative bg-white rounded-3xl border border-gray-100 text-center py-20 px-8 overflow-hidden">
+              <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-primary-50 opacity-50" />
+              <div className="absolute -bottom-4 -left-4 w-24 h-24 rounded-full bg-violet-50 opacity-50" />
+              <div className="relative z-10">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary-100 to-violet-100 flex items-center justify-center mx-auto mb-5 shadow-inner">
+                  <BookOpen size={36} className="text-primary-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">No quizzes found</h3>
+                <p className="text-gray-500 text-sm mt-2 max-w-xs mx-auto">
+                  {isTeacher ? 'Create your first quiz to get started.' : 'No quizzes are available at the moment.'}
+                </p>
+                {isTeacher && (
+                  <button onClick={() => setForming({})} className="btn-primary mt-6 mx-auto px-6 py-3 text-sm font-semibold shadow-lg shadow-primary-500/20">
+                    <Plus size={16} /> Create Your First Quiz
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {quizzes.map(q => (
                 <QuizCard
                   key={q._id} quiz={q}
@@ -791,36 +845,55 @@ export default function QuizPage() {
       {tab === 'history' && isStudent && (
         <div className="space-y-4">
           {attemptsLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 size={28} className="animate-spin text-primary-500" />
+            <div className="flex items-center justify-center py-28">
+              <div className="flex flex-col items-center gap-4">
+                <div className="relative">
+                  <div className="w-14 h-14 border-4 border-primary-100 rounded-full" />
+                  <div className="absolute inset-0 w-14 h-14 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+                <p className="text-sm text-gray-400 font-medium">Loading history...</p>
+              </div>
             </div>
           ) : myAttempts.length === 0 ? (
-            <div className="text-center py-20 bg-gray-50 rounded-2xl">
-              <ClipboardList size={40} className="text-gray-200 mx-auto mb-3" />
-              <p className="text-gray-500 font-semibold">No quiz attempts yet</p>
-              <p className="text-sm text-gray-400 mt-1">Go to Browse to take your first quiz</p>
+            <div className="relative bg-white rounded-3xl border border-gray-100 text-center py-20 px-8 overflow-hidden">
+              <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-primary-50 opacity-50" />
+              <div className="absolute -bottom-4 -left-4 w-24 h-24 rounded-full bg-violet-50 opacity-50" />
+              <div className="relative z-10">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary-100 to-violet-100 flex items-center justify-center mx-auto mb-5 shadow-inner">
+                  <ClipboardList size={36} className="text-primary-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">No quiz attempts yet</h3>
+                <p className="text-gray-500 text-sm mt-2 max-w-xs mx-auto">Take your first quiz to see your history here.</p>
+                <button onClick={() => setTab('browse')} className="btn-primary mt-6 mx-auto px-6 py-3 text-sm font-semibold shadow-lg shadow-primary-500/20">
+                  <BookOpen size={16} /> Browse Quizzes
+                </button>
+              </div>
             </div>
           ) : (
             <div className="space-y-3">
               {myAttempts.map(a => (
-                <div key={a._id} className="bg-white rounded-2xl border border-gray-100 p-4 flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 font-black text-sm ${a.passed ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                <div key={a._id} className="group bg-white rounded-2xl border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-all duration-300 p-5 flex items-center gap-4">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 font-black text-base shadow-sm ${
+                    a.passed
+                      ? 'bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-700 border border-emerald-200'
+                      : 'bg-gradient-to-br from-red-100 to-rose-100 text-red-700 border border-red-200'
+                  }`}>
                     {a.percentage}%
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-900 text-sm truncate">{a.quiz?.title || 'Quiz'}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{[a.quiz?.subject, a.quiz?.module].filter(Boolean).join(' · ')}</p>
+                    <p className="font-bold text-gray-900 text-sm truncate group-hover:text-primary-700 transition-colors">{a.quiz?.title || 'Quiz'}</p>
+                    <p className="text-xs text-gray-500 mt-1">{[a.quiz?.subject, a.quiz?.module].filter(Boolean).join(' · ')}</p>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${a.passed ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
+                    <span className={`inline-flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-lg border ${a.passed ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
                       {a.passed ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
                       {a.passed ? 'Passed' : 'Failed'}
                     </span>
-                    <p className="text-xs text-gray-400 mt-1">{new Date(a.submittedAt).toLocaleDateString()}</p>
+                    <p className="text-xs text-gray-400 mt-1.5">{new Date(a.submittedAt).toLocaleDateString()}</p>
                   </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-xs font-semibold text-gray-700">{a.score}/{a.totalPoints} pts</p>
-                    <p className="text-xs text-gray-400">{fmt(a.timeSpent)}</p>
+                  <div className="text-right flex-shrink-0 pl-2 border-l border-gray-100">
+                    <p className="text-sm font-bold text-gray-800">{a.score}/{a.totalPoints}</p>
+                    <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1 justify-end"><Clock size={9} />{fmt(a.timeSpent)}</p>
                   </div>
                 </div>
               ))}

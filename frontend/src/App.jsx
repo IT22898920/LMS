@@ -23,6 +23,7 @@ import FeedbackPage from './pages/Feedback/FeedbackPage';
 import QuizPage from './pages/Quiz/QuizPage';
 import ProgressDashboard from './pages/Progress/ProgressDashboard';
 import CoursesPage from './pages/Courses/CoursesPage';
+import SupportTicketPage from './pages/SupportTickets/SupportTicketPage';
 
 const DashboardRouter = () => {
   const { user } = useAuth();
@@ -87,6 +88,7 @@ function AppRoutes() {
         <Route path="courses"         element={<ProtectedRoute><CoursesPage /></ProtectedRoute>} />
         <Route path="feedback"        element={<ProtectedRoute><FeedbackPage /></ProtectedRoute>} />
         <Route path="quiz"            element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+        <Route path="support-tickets" element={<ProtectedRoute roles={['admin','student']}><SupportTicketPage /></ProtectedRoute>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

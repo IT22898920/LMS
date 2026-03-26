@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, Users, Link2, FileText, Users2,
   Activity, LogOut, GraduationCap, Shield, BookOpen,
-  ChevronRight, Heart, BookMarked, MessageSquare, ClipboardList, BarChart3, Layers,
+  ChevronRight, Heart, BookMarked, MessageSquare, ClipboardList, BarChart3, Layers, LifeBuoy,
 } from 'lucide-react';
 
 const ROLE_COLORS = {
@@ -28,6 +28,7 @@ const navItems = {
     { to: '/dashboard/activity',   label: 'Activity Monitor',icon: Activity },
     { to: '/dashboard/feedback',   label: 'Feedback',        icon: MessageSquare },
     { to: '/dashboard/quiz',       label: 'Quiz Management', icon: ClipboardList },
+    { to: '/dashboard/support-tickets', label: 'Support Tickets', icon: LifeBuoy },
   ],
   teacher: [
     { to: '/dashboard',            label: 'Dashboard',       icon: LayoutDashboard },
@@ -50,6 +51,7 @@ const navItems = {
     { to: '/dashboard/activity',   label: 'My Activity',     icon: Activity },
     { to: '/dashboard/feedback',   label: 'Feedback',        icon: MessageSquare },
     { to: '/dashboard/quiz',       label: 'Quizzes',         icon: ClipboardList },
+    { to: '/dashboard/support-tickets', label: 'Support Tickets', icon: LifeBuoy },
   ],
   guardian: [
     { to: '/dashboard',            label: 'Dashboard',       icon: LayoutDashboard },
